@@ -1,0 +1,7 @@
+
+valeur contact sensor:[325.01280922]
+valeur contact sensor:[316.89041311]
+valeur contact sensor:[282.18360282]
+valeur contact sensor:[0.]
+valeur contact sensor:[0.]
+valeur contact sensor:[0.]

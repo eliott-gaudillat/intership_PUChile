@@ -1,0 +1,6 @@
+PD_controller target (quart de cercle Haut-droite) mean score: -4.920596480042582
+PD_controller target ( demi cercle droit) mean score: mean score: -5.571945375795076
+PD_controller target (cercle) mean score: -10
+
+OSC_controller target (0.1,0.1) mean score : mean score: -14.403818958370891 (controller not optimise , slow and overshoot)
+
