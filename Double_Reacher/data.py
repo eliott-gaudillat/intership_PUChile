@@ -16,17 +16,10 @@ def impedance(observation):
 	m2=m1
 	
 	#affectations des valeurs d'observation
-	cosq1R,cosq2R,sinq1R,sinq2R,cosq1L,cosq2L,sinq1L,sinq2L=observation[:8]
-	error_q1R_point,error_q2R_point,error_q1L_point,error_q2L_point=observation[8:12]
-	xR_error,yR_error,zR_error,xL_error,yL_error,zL_error=observation[12:18]
-	x_current_target,y_current_target,z_current_target=observation[20:23]
-	xdot_current_target,ydot_current_target,zdot_current_target=observation[23:26]
-	Rxdot_current_target,Rydot_current_target,Rzdot_current_target=observation[26:29]
-	xdd_current_target,ydd_current_target,zdd_current_target=observation[29:32]
-	Rxdd_current_target,Rydd_current_target,Rzdd_current_target=observation[32:]
+	cosq1,cosq2,sinq1,sinq2,x_star,y_star,q1_point,q2_point,x_error,y_error,z_error=observation
 
-	#matrice mass-spring-damper
-
+	
+	#plutot pas mal
 	Mm=np.diag([70,70])
 	Dm=np.diag([6,6])
 	Km=np.diag([15,15])

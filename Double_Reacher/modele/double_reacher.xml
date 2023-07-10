@@ -1,0 +1,70 @@
+<mujoco model="reacher">
+	<compiler angle="radian" inertiafromgeom="true"/>
+	<default>
+		<joint armature="1" damping="1" limited="true"/>
+		<geom contype="0" friction="1 0.1 0.1" rgba="0.7 0.7 0 1"/>
+	</default>
+	<option gravity="0 0 -9.81"  integrator="RK4" timestep="0.01"/>
+	<worldbody>
+		<!-- Arena -->
+		<geom conaffinity="7" contype="8" name="ground" pos="0 0 0" rgba="0.9 0.9 0.9 1" size="1 1 10" type="plane"/>
+		<geom conaffinity="7" fromto="-.3 -.3 .01 .3 -.3 .01" name="sideS" rgba="0.9 0.4 0.6 1" size=".02" type="capsule"/>
+		<geom conaffinity="7" fromto=" .3 -.3 .01 .3  .3 .01" name="sideE" rgba="0.9 0.4 0.6 1" size=".02" type="capsule"/>
+		<geom conaffinity="7" fromto="-.3  .3 .01 .3  .3 .01" name="sideN" rgba="0.9 0.4 0.6 1" size=".02" type="capsule"/>
+		<geom conaffinity="7" fromto="-.3 -.3 .01 -.3 .3 .01" name="sideW" rgba="0.9 0.4 0.6 1" size=".02" type="capsule"/>
+		<!--<geom conaffinity="7" fromto="0.05 -.3 .01 0.05 .3 .01" name="sideTest" rgba="0.2 0.4 0.6 1" size=".02" type="capsule"/>-->
+		
+		
+		
+		<!-- Arm -->
+		<geom conaffinity="0" contype="0" fromto=".1 0 0 .1 0 0.02" name="root_right" rgba="0.9 0.4 0.6 1" size=".011" type="cylinder"/>
+		<body name="body0" pos=".1 0 .01">
+			<geom fromto="0 0 0 0.1 0 0" name="link0_right" rgba="0.0 0.4 0.6 1" size=".01" type="capsule"/>
+			<joint axis="0 0 1" limited="false" name="joint0_right" pos="0 0 0" type="hinge"/>
+			<body name="body1_right" pos="0.1 0 0">
+				<joint axis="0 0 1" limited="true" name="joint1_right" pos="0 0 0" range="-3.0 3.0" type="hinge"/>
+				<geom fromto="0 0 0 0.1 0 0" name="link1_right" rgba="0.0 0.4 0.6 1" size=".01" type="capsule"/>
+				<body name="fingertip_right" pos="0.11 0 0">
+					<geom conaffinity="7" contype="6" name="fingertip_right" pos="0 0 0" rgba="0.0 0.8 0.6 1" size=".01" type="sphere"/>
+					<site name="fingertip_contact_right" type="sphere" size=".01" rgba="0.0 0.8 0.6 1"/>
+				</body>
+				
+			</body>
+		</body>
+		<geom conaffinity="0" contype="0" fromto="-.1 0 0 -.1 0 0.02" name="root_left" rgba="0.9 0.4 0.6 1" size=".011" type="cylinder"/>
+		<body name="body00" pos="-.1 0 .01">
+			<geom fromto="0 0 0 0.1 0 0" name="link0_left" rgba="0.0 0.4 0.6 1" size=".01" type="capsule"/>
+			<joint axis="0 0 1" limited="false" name="joint0_left" pos="0 0 0" type="hinge"/>
+			<body name="body1_left" pos="0.1 0 0">
+				<joint axis="0 0 1" limited="true" name="joint1_left" pos="0 0 0" range="-3.0 3.0" type="hinge"/>
+				<geom fromto="0 0 0 0.1 0 0" name="link1_left" rgba="0.0 0.4 0.6 1" size=".01" type="capsule"/>
+				<body name="fingertip_left" pos="0.11 0 0">
+					<geom conaffinity="7" contype="6" name="fingertip_left" pos="0 0 0" rgba="0.3 0.8 0.6 1" size=".01 " type="sphere"/>
+					<site name="fingertip_contact_left" type="sphere" size=".01" rgba="0.0 0.8 0.6 1"/>
+				</body>
+				
+			</body>
+		</body>
+		
+
+  
+
+		<!-- Target -->
+		<body name="target" pos="0 0.1 .01">
+			<freejoint name="joint_target" />
+			<geom conaffinity="6" contype="7"condim="1" name="target_geom" pos="0 0 0" rgba="0.9 0.2 0.2 1" size=".01  "mass="10" type="sphere"/>
+			<!--<site name="target_contact" type="box" size=".01 .01 .01" rgba="0.0 0.8 0.6 1"/>-->
+		</body>
+	</worldbody>
+	<actuator>
+		<motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="200.0" joint="joint0_right"/>
+		<motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="200.0" joint="joint1_right"/>
+		<motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="200.0" joint="joint0_left"/>
+		<motor ctrllimited="true" ctrlrange="-1.0 1.0" gear="200.0" joint="joint1_left"/>
+	</actuator>
+	 <sensor>
+		<!--  <touch name="sensor_fingertip_right" site="fingertip_contact_right"/>
+		<touch name="sensor_fingertip_left" site="fingertip_contact_left"/>
+		<touch name="sensor_target" site="target_contact"/>-->
+	</sensor> 
+</mujoco>

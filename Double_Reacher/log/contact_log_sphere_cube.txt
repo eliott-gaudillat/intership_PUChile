@@ -1,0 +1,40 @@
+
+ step :1
+ contact droite:[]
+ contact gauche[]
+ ################
+ step :2
+ contact droite:[]
+ contact gauche[]
+ ################
+ step :3
+ contact droite:[]
+ contact gauche[]
+ ################
+ step :4
+ contact droite:[]
+ contact gauche[]
+ ################
+ step :5
+ contact droite:[]
+ contact gauche[]
+ ################
+ step :6
+ contact droite:[]
+ contact gauche[]
+ ################
+ step :7
+ contact droite:[]
+ contact gauche[]
+ ################
+ step :8
+ contact droite:[]
+ contact gauche[]
+ ################
+ step :9
+ contact droite:[]
+ contact gauche[(array([-0.00973345,  0.10460927,  0.00998666]), array([ 9.99998758e-01,  8.04132673e-04, -1.35522997e-03, -8.04131935e-04,
+        9.99999677e-01,  1.08978505e-06,  1.35523041e-03,  0.00000000e+00,
+        9.99999082e-01]), array([ 75.90854465, -52.30917311, -23.59937154,   0.        ,
+         0.        ,   0.        ]))]
+ ################(pos,frame,res)

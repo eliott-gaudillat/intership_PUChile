@@ -31,7 +31,7 @@ score=0;
 x_star_target,y_star_target=observation[18:20]
 #calcul des q1,q2 desirée
 q1R_star,q2R_star,q1L_star,q2L_star=MGIv2(x_star_target,y_star_target)
-
+print("1r:",q1R_star,"2r:",q2R_star,"1l:",q1L_star,"2l:",q2L_star)
 
 # calcul des q1 et q2 actuel
 cosq1R,cosq2R,sinq1R,sinq2R,cosq1L,cosq2L,sinq1L,sinq2L=observation[:8]
