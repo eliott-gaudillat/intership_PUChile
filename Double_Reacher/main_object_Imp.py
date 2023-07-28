@@ -52,10 +52,10 @@ while(not Erreur):
 	else:
 		Erreur=True
 	i-=1
-	if(i==0):
-		force=[0,0,0,0,0,0]
-		body_id=7
-		env.add_external_force(force,body_id)
+	#if(i==0):
+	#	force=[0,0,0,0,0,0]
+	#	body_id=7
+	#	env.add_external_force(force,body_id)
 
 	
 tmp.close()

@@ -30,14 +30,14 @@ def SmallestSignedAngleBetween(theta1, theta2):     # Para que el angulo se mant
 if __name__ == '__main__':
 	glfw.init()
 	env = gym.make("Reacher-v4", max_episode_steps=130,render_mode="human")
-	
+	#env = gym.make("Reacher-v4", max_episode_steps=130)
 	agent=Agent(input_dims=env.observation_space.shape,env=env,n_actions=env.action_space.shape[0])
-	n_epochs=6
-	n_games=250
+	n_epochs=15
+	n_games=200
 	Kdist=1
-	Kctrl=1
+	Kctrl=4
 	filename='reacher.png'
-	
+	lvl=0
 	figure_file='plots/'+filename
 	
 	best_score=env.reward_range[0]
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
 	for j in range(n_epochs):
 		for i in range (n_games):
-			observation,_=env.reset(random=j)
+			observation,_=env.reset(random=lvl)
 			done=False
 			score =0
 			error_q1=1
@@ -69,7 +69,7 @@ if __name__ == '__main__':
 				#calcul de l'erreur sur chaque articulation
 				error_q1=q1_star-q1
 				error_q2=q2_star-q2
-				done=terminated or truncated or (abs(error_q1)<1e-4 and abs(error_q2)<1e-4)
+				done=terminated or truncated or (abs(error_q1)<5e-3 and abs(error_q2)<5e-3)
 				score+=reward
 				agent.remember(observation,action,reward,observation_,done)
 				if not load_checkpoint:
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 				time_game=tps2 - tps1	
 					
 			if(i%50==0):
-				t_total_sec=(n_epochs-j-1)*(n_games-i-1)*time_game
+				t_total_sec=(n_games-i-1)*time_game+(n_epochs-j-1)*(n_games-1)*time_game
 				t_total_minute=t_total_sec/60
 				t_minute_left=t_total_minute%60
 				t_total_heure=t_total_minute//60
@@ -100,7 +100,9 @@ if __name__ == '__main__':
 					agent.save_models()
 					
 			
-		print("epochs numero :" ,j,"avg_score:",avg_score)		
+		print("epochs numero :" ,j,"avg_score:",avg_score)	
+		if(best_score >-20):
+			lvl+=1	
 		if not load_checkpoint:
 			x=[i+1 for i in range(n_games*(j+1))]
 			plot_learning_curve(x,score_history,figure_file)

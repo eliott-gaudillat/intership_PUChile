@@ -1,0 +1,3 @@
+sensor/⁠touch (*)
+This element creates a touch sensor. The active sensor zone is defined by a site. If a contact point falls within the site’s volume, and involves a geom attached to the same body as the site, the corresponding contact force is included in the sensor reading. If a contact point falls outside the sensor zone, but the normal ray intersects the sensor zone, it is also included. This re-projection feature is needed because, without it, the contact point may leave the sensor zone from the back (due to soft contacts) and cause an erroneous force reading. 
+The output of this sensor is non-negative scalar. It is computed by adding up the (scalar) normal forces from all included contacts.

@@ -24,12 +24,15 @@ score=0;
 x_star_target,y_star_target=observation[18:20]
 
 tmp = open("contact_log.txt", "w")
-i=200
+i=1
 # calcul des q1 et q2 actuel
 print(observation)
-
+sensor_L=0
+sensor_R=0
+sensor_composite_L = np.load('SL.npy')
+sensor_composite_R = np.load('SR.npy')
 # boucle de controle jusqu'à avoir une erreur proche de zéro
-while(i!=0):
+while(i!=100):
 
 	cosq1R,cosq2R,sinq1R,sinq2R,cosq1L,cosq2L,sinq1L,sinq2L=observation[:8]
 	error_q1R_point,error_q2R_point,error_q1L_point,error_q2L_point=observation[8:12]
@@ -60,11 +63,15 @@ while(i!=0):
 	actionT= np.reshape(U,(1,4))
 	actionT=[actionT[0,0] ,actionT[0,1],actionT[0,2],actionT[0,3]]
 	#actionT=[0 ,0,actionT[0,2],actionT[0,3]]
-	
-	contact_R,contact_L=env.contact()
+	#actionT=[0 ,0,0,0]
+	data_sensor,contact_R,contact_L=env.contact()
 	tmp.write("\n contact droite:"+ str(contact_R))
 	tmp.write("\n contact gauche"+str(contact_L))
 	tmp.write("\n ################")
+	#print("############")
+	
+	sensor_L=np.append(sensor_L,data_sensor[0])
+	sensor_R=np.append(sensor_R,data_sensor[1])
 	#i-=1
 	#if(i==0):
 	#	force=[1000,0,0,0,0,0]
@@ -74,9 +81,27 @@ while(i!=0):
 		
 
 	#envoie de la commande dans l'environnement 
-	i-=1
+	i+=1
 	observation, reward, terminated, truncated, info = env.step(actionT)
 	time.sleep(0.1)
+	
+
+#np.save('SL.npy', sensor_L)
+#np.save('SR.npy', sensor_R)
+
+#a2 = np.load('test3.npy')
+
+time=np.arange(i)
+plt.figure(1)
+plt.plot(time, sensor_L)
+plt.plot(time, sensor_composite_L)
+plt.title('log_sensor_L')
+plt.savefig("plot_SL")
+plt.figure(2)
+plt.plot(time, sensor_R)
+plt.plot(time, sensor_composite_R)
+plt.title('log sensor_R')
+plt.savefig("plot_SR")		
 tmp.close()
 glfw.terminate()
 env.close()

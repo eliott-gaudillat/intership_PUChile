@@ -1,0 +1,87 @@
+installation dual_boot/gym/mujoco/mujoco_py
+
+Implémentation différents types de controlleur sur le bras a 2dof Reacher sous l'environnement mujoco
+PD/OSC/LQR/SAC_RL
+
+
+Simuler une force exterieur sous mujoco pour implementer  un controlleur a impedence :
+utiliser pour le travail avec les hommes ou un environnement changeant
+donne de la souplesse au robot , lorsqu'on lui applique une force exterieur , il reagit plus au moins librement en fonction de la tension
+du ressort (imaginaire ) qu'on autorise 
+utile contact avec une branche par exemple ou personne pousse le bras , il revient à ça place après.
+
+controlleur a impedance:
+possible en coordonnées articulaire -> torque
+et en coordonnes d'espace -> Force
+donc pour un controlleur en coordonnes articulaire il nous faut savoir l'impact d'une force exterieur au niveau du torque
+et pour les coordonnes il faut connaitre la force ( repere end effector ?)
+torque-> Jtranspose*F : question si force entre deux articulations impacte toute les articulations ? 
+
+pas forcement besoin de capteur , 
+implémentation ok , question comment bien choisir les parametres D,K,M, et comment vérifier le comportement de mon robot?
+
+mujoco:
+On peut définir des capteurs en ajoutant dans le XML du model , un site (lieu pour acceuil le capteur ), et un sensor avec un nom et le site sur le quel 
+il est accroché
+On peut consulter données des capteurs dans mjData du modele  mjData.sensordata
+problème sensor de type touch , renvoie en valeur la somme des forces normal appliqué sur la zone du capteur
+Pour enregistrer un contact il faut compatibilité entre les deux objets , pour cela il faut parametrerles coefficient  conaffinity="1" contype="1" dans le xml
+pour que le conaffinity de l'objet 1 corresponde au contype de l'objet 2 et l'inverse également .
+
+
+On peut ajouter des forces exterieurs a exercer en modifiant les valeurs de data.qfrc_applied ou data.xfrc_applied
+qfrc_applied est un tableau contenant les valeurs a appliquer a chaque articulation tandis que xfrc_applied est un tableau avec la force appliquer au
+different corps( body) 6D ( force+torque)
+problème xfrc_applied s'applique au centre de masse du corps , si on veut l'appliquer a un point précis, il faut soit utiliser la fonction qui est 
+utilisé en interne mj_applyFT ou le faire manuellement utiliser mj_jac() au point desirer et multiplie la force par la transposer  de la  jacobienne et ajouter le 
+res  a qfrc_applied. 
+Problème avec la sur-couche mujocoPy qui permet d'utiliser mujoco initialement en C sous python , toute les fonctions ne sont pas accessibles.
+cela concerne les fonctions que je souhaite utiliser mj_applyFT , mj_jac , mj_contactForce
+
+Pour pouvoir utiliser les fonctions , il faudrait peut-etre modifier le code source ou ajouter les fonctions dans la surcouche mujocoPy
+a chercher
+Solution numero deux si trop compliqué ajouté de nouveau corps assez petit et sans masse qui servirant de point de contact sur le quelle on pourrait appliquer
+les forces sur son centre de masse qui correspondrait bien au point ou l'on souhiate appliquer la force sur le corps
+
+Acces au fonction en important mujoco_py dans le .py du modele et en changer la classe mere de MujocoEnv a MuJocoPyEnv
+avec ca on a un modele dependant de mujoco-py binding et on a donc acces au differentes fonction du client mujoco-py
+on a desormais accès au fonction mj_jac probleme elle necessite un id de corps  or avec sensor-touch
+on a accès au data contact mais celle ci contient l'id de la geom et non du body on a donc un décalage
+
+
+
+
+creer un nouveau modéle , ajouter le nom du fichier dans le registe dans gym/envs/_init__.py
+
+
+Robotique de précision pour l'agriculture et apprentissage par renforcement 
+travail sur l'environnement de simulation mujoco
+
+Définition du modèle du robot:
+au début bras robotique 2dof 
+calcul matrice coriolis,jacobienne,Inertie 
+MGD,MGI,MDD,MDI
+
+travail préliminaire :
+Recap theorie ? comparaison analyse de données ?
+implémentation de loi de commande traditionnel  PID/ OSC / LQR
+approche du l'apprentissage par renforcement  avec implémentation d'un controleur SAC
+
+
+travail :
+pb de la robotique en milieu agricole , l'environnement est hostile et evolutif
+presence de branche etc 
+
+Pour la robotique dans ce type d'environnement ou des contacts peuvent avoir lieu ( travail avec humain , environnement hostile)
+on peut implémenter un controleur par impédence 
+principe : implémentation d'un système masse-amortisseur-ressort virtuel sur les articulations pour venir compenser les forces
+exterieurs qui peuvent interferer sur le robot
+impact des coefficents / contact prévu ou non , phase transitoire
+
+test: 
+environnement mujoco_py 
+robot reacher_v4  ( necessité de personnalisé le modele  ajout  de fonction dans le .py modification du modele .xml)
+Comment tester 
+ajout de force exterieur sur le robot en fonction des coefficient K,M,D le comportement 
+du robot est défini, et jouant sur ses coeefficient on est sensé observer des comportement différents
+

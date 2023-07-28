@@ -1,0 +1,6 @@
+Comparison of Two Methods of Incorporating an Integral Action in Linear Quadratic Regulator Hanmant G. Malkapure*. M. Chidambaram*
+https://studywolf.wordpress.com/site-index/
+MODERN ROBOTICS MECHANICS, PLANNING, AND CONTROL Kevin M. Lynch and Frank C. Park December 30, 2019
+A Linear-Quadratic Regulator with Integral Action Applied to PWM DC-DC Converters DOI: 10.1109/IECON.2006.347726
+ Dynamic Performance Comparison of LQR and LQI Controllers on Buck Converter 
+  N. Hogan, Impedance Control: An Approach to Manipulation: Part I—Theory  ;  Part II—Implementation  ;  Part III—Applications. Journal of Dynamic Systems, Measurement, and Control, 1985. DOI : 10.1115/1.3140702  ;  10.1115/1.3140713  ;  10.1115/1.3140701

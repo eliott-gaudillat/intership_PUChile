@@ -17,7 +17,7 @@
 	V_sphere=4/3*np.pi*r*r*r
 	m1=(V_tube+V_sphere)*mv
 	m2=m1
-	Kp=0.09
+	Kp=6
 	
 	theta_dot=np.array([[w1],[w2]])
 	

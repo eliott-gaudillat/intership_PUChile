@@ -1,11 +1,12 @@
 import numpy as np
 import random
+import mujoco_py
 from gym import utils
-from gym.envs.mujoco import MujocoEnv
+from gym.envs.mujoco import MuJocoPyEnv
 from gym.spaces import Box
 
 
-class ReacherEnv(MujocoEnv, utils.EzPickle):
+class ReacherEnv(MuJocoPyEnv, utils.EzPickle):
     """
     ### Description
     "Reacher" is a two-jointed robot arm. The goal is to move the robot's end effector (called *fingertip*) close to a
@@ -130,12 +131,12 @@ class ReacherEnv(MujocoEnv, utils.EzPickle):
     def __init__(self, **kwargs):
         utils.EzPickle.__init__(self, **kwargs)
         observation_space = Box(low=-np.inf, high=np.inf, shape=(11,), dtype=np.float64)
-        MujocoEnv.__init__(
+        MuJocoPyEnv.__init__(
             self, "double_reacher.xml", 2, observation_space=observation_space, **kwargs
         )
 
     def step(self, a):
-        vec = self.get_body_com("fingertip") - self.get_body_com("target")
+        vec = self.get_body_com("fingertip_left") - self.get_body_com("target")
         reward_dist = -np.linalg.norm(vec)
         reward_ctrl = -np.square(a).sum()
         reward = reward_dist + reward_ctrl
@@ -157,12 +158,14 @@ class ReacherEnv(MujocoEnv, utils.EzPickle):
         assert self.viewer is not None
         self.viewer.cam.trackbodyid = 0
 
+
     def reset_model(self,random=0):
-        qpos = (
-            self.np_random.uniform(low=-0.1, high=0.1, size=self.model.nq)
-            + self.init_qpos
-        )
-        qpos=(1,1,1,1)
+        #qpos = (
+          #  self.np_random.uniform(low=-0.1, high=0.1, size=self.model.nq)
+          #  + self.init_qpos
+        #)
+        #qpos=np.array([0.1,1,1,1,0,0.1,0,0,0,0,0])
+        qpos=np.array([1.25,1.77,1.89,-1.77,0,0.1,0,0,0,0,0])
         while True:
         #aleatoire
             #self.goal = self.np_random.uniform(low=-0.2, high=0.2, size=2)
@@ -175,7 +178,7 @@ class ReacherEnv(MujocoEnv, utils.EzPickle):
             	self.goal = self.np_random.uniform(low=-0.2, high=0.2, size=2)
             if np.linalg.norm(self.goal) < 0.2:
                 break
-        qpos[-2:] = self.goal
+        #qpos[-2:] = self.goal
         qvel = self.init_qvel + self.np_random.uniform(
             low=-0.005, high=0.005, size=self.model.nv
         )
@@ -184,15 +187,59 @@ class ReacherEnv(MujocoEnv, utils.EzPickle):
         return self._get_obs()
 
 
-
+    def info_target(self):
+    	BODY=1
+    	GEOM=5
+    	id_target=mujoco_py.functions.mj_name2id(self.model,GEOM,"target_geom")
+    	pos=self.data.get_geom_xpos('target_geom')
+    	velp=self.data.get_geom_xvelp('target_geom')
+    	velr=self.data.get_geom_xvelr('target_geom')
+    	accRes=np.zeros(6, dtype=np.float64)
+    	mujoco_py.functions.mj_objectAcceleration(self.model,self.data,GEOM,id_target,accRes, 0)
+    	return pos,velp,velr,accRes
+        
+        
+        
     def _get_obs(self):
-        theta = self.data.qpos.flat[:2]
+        thetaR = self.data.qpos.flat[:2]
+        thetaL = self.data.qpos.flat[2:4]
+        data_target=self.info_target()
+        pos,velp,velr,accRes=self.info_target()
         return np.concatenate(
             [
-                np.cos(theta),
-                np.sin(theta),
-                self.data.qpos.flat[2:],
-                self.data.qvel.flat[:2],
-                self.get_body_com("fingertip") - self.get_body_com("target"),
+                np.cos(thetaR),#cos q1 et q2 right
+                np.sin(thetaR),#sin q1/2 R
+                np.cos(thetaL),#cos q1/2 Left
+                np.sin(thetaL),#sin q1/2 Left -> [0:8]
+                self.data.qvel.flat[:4], # q_dot [8:12]
+                self.get_body_com("fingertip_right") - self.get_body_com("target"),#dist armR and target x y z
+                self.get_body_com("fingertip_left") - self.get_body_com("target"),#dist armR and target-> [12:18]
+                self.data.qpos.flat[4:6], # pos init target [18:20]
+                pos,  #pos current target [20:23]
+                velp, #vel target [23:26]
+                velr,  #w target [26:29]
+                accRes[3:], #acc target[29:32]
+                accRes[:3]#wdot target[32:]
+                
+                
             ]
         )
+    def contact(self):
+    	contact_R=[]
+    	contact_L=[]
+    	GEOM=5
+    	id_target=mujoco_py.functions.mj_name2id(self.model,GEOM,"target_geom")
+    	id_right=mujoco_py.functions.mj_name2id(self.model,GEOM,"fingertip_right")
+    	id_left=mujoco_py.functions.mj_name2id(self.model,GEOM,"fingertip_left")
+    	for c in range(self.data.ncon):
+    		res=np.zeros(6, dtype=np.float64)
+    		mujoco_py.functions.mj_contactForce(self.model,self.data, c,res)
+    		frame=self.data.contact[c].frame
+    		pos=self.data.contact[c].pos
+    		geom1=self.data.contact[c].geom1
+    		geom2=self.data.contact[c].geom2
+    		if(geom1==id_target and geom2==id_right) or (geom2==id_target and geom1==id_right):
+    			contact_R.append((pos,frame,res))
+    		if(geom1==id_target and geom2==id_left) or (geom2==id_target and geom1==id_left):
+    			contact_L.append((pos,frame,res))
+    	return contact_R,contact_L
